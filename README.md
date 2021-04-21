@@ -1,4 +1,4 @@
-# Salesforce integeration
+# Salesforce integration
 
 ## Overview
 
@@ -68,7 +68,7 @@ The version of the Salesforce API at the time of writing is `v50.0`.
 
 ## Setting up the sample
 
-Create a new conencted app on Salesforce:
+Create a new connected app on Salesforce:
 
 1. Register a new connected app on Salesforce
 1. Enable the OAuth 2.0 settings.
@@ -145,7 +145,7 @@ Modify an existing account based on the Account details passed in as the input p
 
 #### DeleteAccount
 
-Remove an existing account. based on an `Id` input parameter.
+Remove an existing account based on an `Id` input parameter.
 
 ---
 
@@ -183,4 +183,4 @@ This function retrieves all the account objects from the Salesforce API. For eac
 
 #### WriteAccountsToCSV
 
-This function retirves all the accounts from the Salesforce API and logs them to a local CSV file.
+This function retrieves all the accounts from the Salesforce API and logs them to a local CSV file.

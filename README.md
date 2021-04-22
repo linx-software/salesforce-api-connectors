@@ -52,15 +52,11 @@ END
 - Linx Designer
 - Salesforce account
 
----
-
-### Dependencies
-
-#### Linx Designer
+### Linx Designer
 
 This solution was developed in the Linx Designer `v5.20.2.0`
 
-#### Salesforce API
+### Salesforce API
 
 The version of the Salesforce API at the time of writing is `v50.0`.
 

@@ -1,16 +1,29 @@
-# Salesforce integration
+# salesforce
 
 ## Description
-Retrieving and sending data to the Salesforce API via HTTP requests.
+
+Managing many of the existing manual tasks on Salesforce such as updating customers between systems or recieving quotes, can be automated with Linx and API requests. 
+
+This sample demonstrates automating some account related tasks on Salesforce.
+
+The sample also contains some generically designed functions that connect and make requests to the Salesforce API. You can copy and use these functions in your own Linx Solution to integrate with several 3rd-party systems such as Xero, Quickbooks or SageX3 for accouting or something like DEARSystems for inventory management which can all be done via API.
+
+
+Features:
+- Syncing accounts from a csv file.
+- Deleting all accounts.
+- Retrieving and writing out accounts to a csv file.
+
 
 ## Installation
 
+
 ### Create a new connected app on Salesforce:
 
-1. Register a new connected app on Salesforce
+1. Register a new connected app on [Salesforce.com](https://login.salesforce.com/)
 1. Enable the OAuth 2.0 settings.
-   1. Configure the Callback URL to be: `http://localhost:8080/salesforce/oauth/token`
-   1. Select the scopes:
+   - Configure the Callback URL to be: `http://localhost:8080/salesforce/oauth/token`
+   - Select the scopes:
       - `Full access (full)`
       - `Perform requests on your behalf at any time (refresh_token, offline_access)`
 1. Save your connected app.
@@ -19,7 +32,8 @@ Retrieving and sending data to the Salesforce API via HTTP requests.
 
 ### Configure the Solution's $.Settings:
 
-1. Open the sample Solution in your Linx Designer.
+1. Install Linx Designer. Download it [here](https://linx.software/).
+1. Open the sample Solution (.lsoz) in your Linx Designer.
 1. Edit the $.Settings values:
 
    - `linx_database_conn_string`: Configure this setting value with the connection string to your DB instance.
@@ -39,63 +53,48 @@ Retrieving and sending data to the Salesforce API via HTTP requests.
 
 
 
-## Usage
+## Using the sample
 
-### Account
+### Syncing Accounts from a csv file
 
-Location: [Solution] > [Project: Salesforce] > [Folder: Requests]
+Keep your accounts on Salesforce up to date with a csv file.
 
-#### GetAccounts
+This process creates new accounts or updates existing account objects on the Salesforce API based on data imported from a csv file.
 
-Retrieves all the existing Account Ids from Salesforce and returns the list of objects as the result.
+The logic is as follows:
+1. A local directory is scanned and returns matching csv files which contain customer account details.
+2. Each file is then imported line by line and the details of each account are then matched on the Salesforce API.
+3. If an account does not exist then a new account is created using the details retrieved from the file.
+4. If an account already exist, then the latest account details are retrieve from the API, compared to the file record based on the _last modified date_ and if the file record is more recent then the account is updated on the Salesforce API.
+5. Once the import process has completed, the file is moved to a backup location and a record of all the affected accountIds are logged to a local file.
 
-#### GetAccount
+To sync a csv file with your instance of Salesforce, you can use the provided sample csv file as a template for the schema for your data.
 
-Retrieves the detailed information associated with a specific account based on the `Id` input parmeter. This can be used to check modification history as well as used to update the sObject.
+1. Generate the acess token.
+1. Add your csv file to the directory   `C:\Linx\Salesforce\Accounts\Upload\`
+2. Run the the _AddUpdateAccountsFromCsv_ function.
 
-#### CreateAccount
+### Delete all accounts
 
-Create a new account based on the Account details passed in as the input parameter.
+Remove all the accounts from an instance of Salesforce.
 
-#### UpdateAccount
+All the account objects are retrieved from the Salesforce API. For each account, a DELETE request is made to the API which removes it from your instance of Salesforce.
 
-Modify an existing account based on the Account details passed in as the input parameter.
+To remove all the accounts on your instance of Salesforce follow the below steps:
+1. Generate the the access token.
+2. Run the _DeleteAllAccounts_ function.
 
-#### DeleteAccount
+### Export accounts into a csv file
 
-Remove an existing account based on an `Id` input parameter.
+Retrieve all the accounts from Salesforce and write them into a csv file. 
 
-### Template Functions
+This can be used in situations where you need to work with offline or internal documents. This file can then also be synced to something like googlesheets which can be accessed by several users without Salesforce access.
 
-The following custom functions use the request wrapper functions.
+To write out all the accounts on your instance of Salesforce to a csv file:
+1. Run the _WriteAccountsToCsv_ function.
+2. A file containing the accounts will be written to the directory: `C:\Linx\Salesforce\Accounts\Upload\`
 
-#### AddUpdateAccountFromCSV
-
-This function creates new accounts or updates existing account objects on the Salesforce API.
-
-> A file containing testing data related to customers has been added to the repo to test: mock_customers.csv.
-
-The function scans a local directory and returns the matching CSV files for the filter.
-
-The CSV file is imported and then the details are passed into the wrapper function which searches for a matching account on the Salesforce API.
-
-If an account does not exist then a new account is created using a wrapper function using the details retrieved from the text file.
-
-If an account already exist, then the latest account details are retrieve from the API, compared to the file record based on the last modified date and if the file record is more recent then the account is updated on the Salesforce API.
-
-Once the import process has completed, the file is moved to a backup location and a record of all the affected accountIds are logged to a local file.
-
-#### DeleteAllAccounts
-
-This function retrieves all the account objects from the Salesforce API. For each account, a DELETE request is made to the API which removes it.
-
-> ⚠️ WARNING: This will remove all the accounts on your instance of Salesforce and should only be used during development.
-
-
-#### WriteAccountsToCSV
-
-This function retrieves all the accounts from the Salesforce API and logs them to a local CSV file.
-
+_If a file already exists with the same name then the data will get overwritten._
 
 ## Contributing
 

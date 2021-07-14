@@ -46,7 +46,7 @@ Features:
 ### Generate access tokens:
 
 1. Start the debugger on the RESTHost service in the Linx Designer.
-2. Make a request in your browser to `http://localhost:8080/salesforce/oauth/authorize`
+2. Make a request in your browser to [http://localhost:8080/salesforce/oauth/authorize](http://localhost:8080/salesforce/oauth/authorize)
 3. You will be redirected to the Salesforce OAuth 2.0 access consent screen.
 4. Authorize the connected application.
 5. View success message.
@@ -95,6 +95,7 @@ To write out all the accounts on your instance of Salesforce to a csv file:
 2. A file containing the accounts will be written to the directory: `C:\Linx\Salesforce\Accounts\Upload\`
 
 _If a file already exists with the same name then the data will get overwritten._
+
 
 ## Contributing
 

@@ -60,7 +60,7 @@ To test out an area's functionality:
 
 ### Importing the connector functions into your own Solution
 
-2. Right-click on the **SalesforceAPI** folder in the Solution Explorer.
+1. Right-click on the **SalesforceAPI** folder in the Solution Explorer.
 3. Select **Copy**.
 4. Open your own Solution.
 5. Right-click on your Solution Explorer and click **Paste**.

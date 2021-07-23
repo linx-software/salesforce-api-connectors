@@ -2,11 +2,6 @@
 
 ## Description
 
-<<<<<<< HEAD
-=======
-Managing many of the existing manual tasks on Salesforce such as updating customers between systems or receiving quotes, can be automated with Linx and API requests. 
->>>>>>> 8273777567aef4cca1e776332d91f4f76f030bfb
-
 This sample contains multiple pre-built [Linx](https://linx.software) functions which allow you to quickly connect and make HTTP requests the [Salesforce REST API](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/intro_what_is_rest_api.htm). These 'connector' functions have been built and tested to handle to the specifics of interacting with the various Salesforce API methods and objects. You can copy and use these functions in your own Linx Solution to accelerate development. 
 
 

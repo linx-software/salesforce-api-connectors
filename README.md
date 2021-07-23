@@ -1,105 +1,80 @@
-# salesforce
+# salesforce-api-connectors
 
 ## Description
 
-Managing many of the existing manual tasks on Salesforce such as updating customers between systems or recieving quotes, can be automated with Linx and API requests. 
 
-This sample demonstrates automating some account related tasks on Salesforce.
-
-The sample also contains some generically designed functions that connect and make requests to the Salesforce API. You can copy and use these functions in your own Linx Solution to integrate with several 3rd-party systems such as Xero, Quickbooks or SageX3 for accouting or something like DEARSystems for inventory management which can all be done via API.
+This sample contains multiple pre-built [Linx](https://linx.software) functions which allow you to quickly connect and make HTTP requests the [Salesforce REST API](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/intro_what_is_rest_api.htm). These 'connector' functions have been built and tested to handle to the specifics of interacting with the various Salesforce API methods and objects. You can copy and use these functions in your own Linx Solution to accelerate development. 
 
 
-Features:
-- Syncing accounts from a csv file.
-- Deleting all accounts.
-- Retrieving and writing out accounts to a csv file.
-
+The goal of this Linx Solution is to ultimately include custom built connector functions for all the methods of the Salesforce REST API. 
 
 ## Installation
 
+### Retrieving your instance URL:
+Requests made to the Salesforce API must use a unique URL which is based on their instance name. This name needs to be retrieved using the [Identity Url](https://help.salesforce.com/articleView?id=remoteaccess_using_openid.htm&type=0) from Salesforce. This identity url can be retrieved by [querying for user info](https://help.salesforce.com/articleView?id=sf.remoteaccess_using_userinfo_endpoint.htm&type=5) with the access token string. 
 
-### Create a new connected app on Salesforce:
+1. Install the Linx Designer. Download it [here.](https://linx.software)
+2. Open the sample Solution '.lsoz' in your Linx Designer.
+3. Open the Solution's settings and add your Salesforce instance name. For example, if my Salesforce instance URL is `https:/linx-dev-ed.salesforce.com/` then my instance name is "linx-dev-ed". 
+   
+   A function _GetIdentity_ has been included in the sample to retrieve this information if you already posses your access token, see [below](#access-token-generation) for info on access generation.. 
 
-1. Register a new connected app on [Salesforce.com](https://login.salesforce.com/)
-1. Enable the OAuth 2.0 settings.
-   - Configure the Callback URL to be: `http://localhost:8080/salesforce/oauth/token`
-   - Select the scopes:
-      - `Full access (full)`
-      - `Perform requests on your behalf at any time (refresh_token, offline_access)`
-1. Save your connected app.
-1. Generate your **Consumer Secret**.
-1. Copy the **Consumer Key** and **Consumer Secret**.
+### Access token generation
 
-### Configure the Solution's $.Settings:
+Authentication of requests is achieved via access tokens, the functions take in the "access token" used in the request as an input parameter at runtime, which is then added to the header of the request. 
 
-1. Install Linx Designer. Download it [here](https://linx.software/).
-1. Open the sample Solution (.lsoz) in your Linx Designer.
-1. Edit the $.Settings values:
+This "access token" needs to be passed in to each function by you, this could be retrieved from a database, file or external service. 
 
-   - `linx_database_conn_string`: Configure this setting value with the connection string to your DB instance.
-   - `salesforce_app_consumer_key`: Your connected app’s **Consumer Key**
-   - `salesforce_app_consumer_secret`: Your connected app’s **Consumer Secret**
-   - `salesforce_api_version`: Current version of the API, at the time of writing it is `v50.0`, and may change at a later stage.
-
-1. Save the Solution.
-
-### Generate access tokens:
-
-1. Start the debugger on the RESTHost service in the Linx Designer.
-2. Make a request in your browser to [http://localhost:8080/salesforce/oauth/authorize](http://localhost:8080/salesforce/oauth/authorize)
-3. You will be redirected to the Salesforce OAuth 2.0 access consent screen.
-4. Authorize the connected application.
-5. View success message.
+You're able to generate and retrieve your token from an external authentication service or, alternatively, you're able to host your own Linx authentication service with the [linx-oauth-token-service](https://github.com/linx-software/linx-oauth2-token-service) project on GitHub.
 
 
+## Using the connector functions
 
-## Using the sample
+This sample contains generic "connector" functions which can be imported and used in your own Linx Solution.
+ 
+Each connector function in the Solution follows the below structure:
+- Takes in an "access token" value as an input parameter.
+- Takes in any data used for the request parameters such as query, path or requestBody values.
+- Makes a HTTP request to the API and returns a string response.
+- The response string is then de-serialized into the function result object type.
 
-### Syncing Accounts from a csv file
+These functions do not persist any data and only return or send data that is received at runtime, therefore you must add your own data persistence layer if required.
 
-Keep your accounts on Salesforce up to date with a csv file.
+### Testing the connectors
 
-This process creates new accounts or updates existing account objects on the Salesforce API based on data imported from a csv file.
+An automated testing function has been included in each sub-sections of the Solution Explorer within the sample Solution to test the relevant functionality. For example the 'Accounts' section contains all the neccessary methods for interacting with the 'Account' object on the Salesforce API.
 
-The logic is as follows:
-1. A local directory is scanned and returns matching csv files which contain customer account details.
-2. Each file is then imported line by line and the details of each account are then matched on the Salesforce API.
-3. If an account does not exist then a new account is created using the details retrieved from the file.
-4. If an account already exist, then the latest account details are retrieve from the API, compared to the file record based on the _last modified date_ and if the file record is more recent then the account is updated on the Salesforce API.
-5. Once the import process has completed, the file is moved to a backup location and a record of all the affected accountIds are logged to a local file.
+To test out an area's functionality:
+1. Located the Test folder of the sub-sections of in the Solution (i.e. Accounts > Tests).
+2. Initalize the debugger on the _TestAllXXXRequests_ functions (i.e. _TestAllAccountRequests_).
+3. Add your access token as an input parameter.
+4. Start the debugger.
+5. The function executes the following requests with test data (i.e _TestAllAccountRequests_):
+   - Creates a new account
+   - Retrieves the details of the new account
+   - Retrieves a list of all of the accounts
+   - Loops through the account list
+   - Updates the relevant account
+6. When the function completes, a test object will have been created and updated on the Salesforce API.
 
-To sync a csv file with your instance of Salesforce, you can use the provided sample csv file as a template for the schema for your data.
 
-1. Generate the acess token.
-1. Add your csv file to the directory   `C:\Linx\Salesforce\Accounts\Upload\`
-2. Run the the _AddUpdateAccountsFromCsv_ function.
 
-### Delete all accounts
+### Importing the connector functions into your own Solution
 
-Remove all the accounts from an instance of Salesforce.
-
-All the account objects are retrieved from the Salesforce API. For each account, a DELETE request is made to the API which removes it from your instance of Salesforce.
-
-To remove all the accounts on your instance of Salesforce follow the below steps:
-1. Generate the the access token.
-2. Run the _DeleteAllAccounts_ function.
-
-### Export accounts into a csv file
-
-Retrieve all the accounts from Salesforce and write them into a csv file. 
-
-This can be used in situations where you need to work with offline or internal documents. This file can then also be synced to something like googlesheets which can be accessed by several users without Salesforce access.
-
-To write out all the accounts on your instance of Salesforce to a csv file:
-1. Run the _WriteAccountsToCsv_ function.
-2. A file containing the accounts will be written to the directory: `C:\Linx\Salesforce\Accounts\Upload\`
-
-_If a file already exists with the same name then the data will get overwritten._
+2. Right-click on the **SalesforceAPI** folder in the Solution Explorer.
+3. Select **Copy**.
+4. Open your own Solution.
+5. Right-click on your Solution Explorer and click **Paste**.
+4. A validation error will occur referencing the missing setting values.
+5. Copy and paste the setting names and values from the Sample solution into your own Solution.
+6. The validation messages will dissapear and you can now drag the required connector functions into your own custom functions.
 
 
 ## Contributing
 
-For questions please ask the [Linx community](https://linx/software/community) or use the [Slack channel](https://linxsoftware.slack.com/archives/C01FLBC1XNX). 
+For questions and issues please ask the [Linx community](https://linx/software/community) or use the [Slack channel](https://linxsoftware.slack.com/archives/C01FLBC1XNX). 
+
+If you have any specific requests for sObjects that have not yet been implemented, get in touch with support@linx.software.
 
 ## License
 
